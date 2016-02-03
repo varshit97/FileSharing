@@ -9,7 +9,7 @@ port = 60000                    # Reserve a port for your service.
 ip=raw_input("Enter IP of the server")
 
 s.connect((ip, port))
-s.send("Hello server!")
+s.send("ls")
 
 with open('received_file', 'wb') as f:
     print 'file opened'

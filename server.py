@@ -1,5 +1,6 @@
 # server.py
 
+from subprocess import Popen,PIPE
 import socket                   # Import socket module
 
 port = 60000                    # Reserve a port for your service.
@@ -13,9 +14,13 @@ print 'Server listening....'
 while True:
     conn, addr = s.accept()     # Establish connection with client.
     print 'Got connection from', addr
-    data = conn.recv(1024)
+    #Data sent from clientside
+    data = conn.recv(2048)
     print('Server received', repr(data))
-
+    if data=='ls':
+        res=Popen(['ls'],stdout=PIPE)
+        print res
+        conn.send(res.stdout.read())
     filename='mytext.txt'
     f = open(filename,'rb')
     l = f.read(1024)
@@ -24,7 +29,7 @@ while True:
        print('Sent ',repr(l))
        l = f.read(1024)
     f.close()
-
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print('Done sending')
     conn.send('Thank you for connecting')
     conn.close()
