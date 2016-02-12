@@ -2,8 +2,9 @@
 
 from subprocess import Popen,PIPE
 import socket                   # Import socket module
+import commands
 
-port = 60000                    # Reserve a port for your service.
+port = 60001                    # Reserve a port for your service.
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
 s.bind(('0.0.0.0', port))            # Bind to the port
@@ -21,6 +22,8 @@ while True:
         res=Popen(['ls'],stdout=PIPE)
         conn.send(res.stdout.read())
     filename='mytext.txt'
+    (status,output)=commands.getstatusoutput('md5sum mytext.txt')
+    conn.send(str(output))
     f = open(filename,'rb')
     l = f.read(1024)
     while (l):
@@ -30,6 +33,6 @@ while True:
     f.close()
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print('Done sending')
-    conn.send('Thank you for connecting')
+    # conn.send('Thank you for connecting')
     conn.close()
 
