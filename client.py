@@ -40,7 +40,6 @@ while True:
                     break
                 # write data to a file
                 f.write(data)
-            print "Out of while"
         f.close()
 #        (status,output)=commands.getstatusoutput('md5sum %s' %(filename))
 #        if(checkvalue==output.split('  ')[0]):

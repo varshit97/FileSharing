@@ -28,9 +28,11 @@ while True:
     #print 'Got connection from', addr
     #Data sent from clientside
     data = conn.recv(1024)
-    print('Server received', repr(data))
-    if(data=='exit'):
+    if not data:
+        conn, addr = s.accept()     # Establish connection with client.
+        #print "In if '%s' " %data
         continue
+    print('Server received', data)
     if data=='ls':
         fileList=showFiles()
         conn.send(fileList)
