@@ -35,12 +35,14 @@ while True:
             while True:
                 print('receiving data...')
                 data = s.recv(1024)
+                s.send('new')
                 print('data=%s', (data))
                 if(data=='0'):
                     break
                 # write data to a file
                 f.write(data)
         f.close()
+        print s.recv(1024)
 #        (status,output)=commands.getstatusoutput('md5sum %s' %(filename))
 #        if(checkvalue==output.split('  ')[0]):
 #	    print 'File Transfered properly'

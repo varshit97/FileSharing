@@ -7,7 +7,7 @@ import commands
 
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
-    return str(output.split('  '))[0]
+    return str(output.split('  ')[0])
 
 def showFiles():
     res=Popen(['ls'],stdout=PIPE)
@@ -42,10 +42,16 @@ while True:
         l = f.read(1024)
         while(l):
             conn.send(l)
+            # conn.close()
+            # conn, addr = s.accept()
+            print conn.recv(1024)
             print('Sent ',repr(l))
             l = f.read(1024)
         conn.send('0')
         f.close()
+        msum = calculateMD5Sum(filename)
+        # print msum
+        conn.send(msum)
         print('Done sending')
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # conn.send('Thank you for connecting')
