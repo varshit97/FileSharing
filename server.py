@@ -19,7 +19,6 @@ while True:
     print('Server received', repr(data))
     if data=='ls':
         res=Popen(['ls'],stdout=PIPE)
-        print res
         conn.send(res.stdout.read())
     filename='mytext.txt'
     f = open(filename,'rb')
