@@ -13,11 +13,12 @@ def showFiles():
     res=Popen(['ls'],stdout=PIPE)
     return res.stdout.read()
 
-port = 60001                    # Reserve a port for your service.
+port = 60000                    # Reserve a port for your service.
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
 s.bind(('0.0.0.0', port))            # Bind to the port
-s.listen(5)                     # Now wait for client connection.
+s.listen(5)       
+empty=''              # Now wait for client connection.
 
 print 'Server listening....'
 
@@ -28,6 +29,8 @@ while True:
     #Data sent from clientside
     data = conn.recv(1024)
     print('Server received', repr(data))
+    if(data=='exit'):
+        continue
     if data=='ls':
         fileList=showFiles()
         conn.send(fileList)
@@ -39,6 +42,7 @@ while True:
             conn.send(l)
             print('Sent ',repr(l))
             l = f.read(1024)
+        conn.send('0')
         f.close()
         print('Done sending')
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

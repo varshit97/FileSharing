@@ -11,7 +11,7 @@ x=str(x.groups(1))[2:-3]
 
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
-port = 60001                    # Reserve a port for your service.
+port = 60000                    # Reserve a port for your service.
 
 s.connect((x, port))
 
@@ -22,6 +22,7 @@ while True:
         lsoutput = s.recv(1024) 
         print lsoutput
     if command=='exit':
+    	s.send('exit')
         break
     elif command=='Download mytext.txt':
         filename='fromserver.txt'
@@ -35,10 +36,11 @@ while True:
                 print('receiving data...')
                 data = s.recv(1024)
                 print('data=%s', (data))
-                if not data:
+                if(data=='0'):
                     break
                 # write data to a file
                 f.write(data)
+            print "Out of while"
         f.close()
 #        (status,output)=commands.getstatusoutput('md5sum %s' %(filename))
 #        if(checkvalue==output.split('  ')[0]):
