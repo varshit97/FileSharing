@@ -23,8 +23,9 @@ while True:
         print lsoutput
     if command=='exit':
         break
-    else:
-        filename='mytext.txt'
+    elif command=='Download mytext.txt':
+        filename='fromserver.txt'
+        s.send("Download mytext.txt")
         #checkvalue = s.recv(1024)
         #filename = checkvalue.split('  ')[1]+'1'
         #checkvalue = checkvalue.split('  ')[0]

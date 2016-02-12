@@ -21,11 +21,12 @@ s.listen(5)                     # Now wait for client connection.
 
 print 'Server listening....'
 
+conn, addr = s.accept()     # Establish connection with client.
+
 while True:
-    conn, addr = s.accept()     # Establish connection with client.
-    print 'Got connection from', addr
+    #print 'Got connection from', addr
     #Data sent from clientside
-    data = conn.recv(2048)
+    data = conn.recv(1024)
     print('Server received', repr(data))
     if data=='ls':
         fileList=showFiles()
@@ -39,8 +40,8 @@ while True:
             print('Sent ',repr(l))
             l = f.read(1024)
         f.close()
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    print('Done sending')
+        print('Done sending')
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # conn.send('Thank you for connecting')
-    conn.close()
+conn.close()
 
