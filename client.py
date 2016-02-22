@@ -4,6 +4,11 @@ import socket                   # Import socket module
 import commands
 import re
 
+def calculateMD5Sum(fileName):
+    (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
+    return str(output.split('  ')[0])
+
+
 (status,output)=commands.getstatusoutput('ifconfig')
 output=str(output)
 x = re.search(r'inet addr:(\S+)',output)
@@ -11,7 +16,7 @@ x=str(x.groups(1))[2:-3]
 
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
-port = 60000                    # Reserve a port for your service.
+port = 60001                    # Reserve a port for your service.
 
 s.connect((x, port))
 
@@ -21,6 +26,10 @@ while True:
         s.send("ls")
         lsoutput = s.recv(1024) 
         print lsoutput
+    if command=='ls -l':
+        s.send("ls -l")
+        details=s.recv(1024)
+        print details
     if command=='exit':
     	s.send('exit')
         break
@@ -42,7 +51,12 @@ while True:
                 # write data to a file
                 f.write(data)
         f.close()
-        print s.recv(1024)
+        md5=calculateMD5Sum(filename)
+        servermd5=s.recv(1024)
+        if servermd5==md5:
+            print "Thope ayyav ga"
+        else:
+            print "pulka raja"
 #        (status,output)=commands.getstatusoutput('md5sum %s' %(filename))
 #        if(checkvalue==output.split('  ')[0]):
 #	    print 'File Transfered properly'

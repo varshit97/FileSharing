@@ -13,7 +13,11 @@ def showFiles():
     res=Popen(['ls'],stdout=PIPE)
     return res.stdout.read()
 
-port = 60000                    # Reserve a port for your service.
+def showDetails():
+    res=Popen(['ls','-l'],stdout=PIPE)
+    return res.stdout.read()
+
+port = 60001                    # Reserve a port for your service.
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
 s.bind(('0.0.0.0', port))            # Bind to the port
@@ -36,6 +40,9 @@ while True:
     if data=='ls':
         fileList=showFiles()
         conn.send(fileList)
+    if data=='ls -l':
+        details=showDetails()
+        conn.send(details)
     elif data.split(' ')[0]=='Download':
         filename=data.split(' ')[1]
         f = open(filename,'rb')
