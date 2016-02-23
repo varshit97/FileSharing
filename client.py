@@ -17,15 +17,20 @@ x=str(x.groups(1))[2:-3]
 
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
-port = 60002                    # Reserve a port for your service.
+port = 60001                    # Reserve a port for your service.
 
 requests=[]
 
 s.connect((x, port))
 
 while True:
+    #Take input
     command=raw_input("Enter Command : ")
+
+    #Store requests
     requests.append(command)
+
+    #Handle requests
     if 'IndexGet shortlist' in command:
         command = command.split(" ")
         start = command[2]+" "+command[3]
@@ -45,14 +50,17 @@ while True:
                     break
                 print(data)
         print
+
     if command=='IndexGet longlist':
         s.send("ls -l")
         details=s.recv(1024)
         print details
+
     if 'IndexGet regex' in command:
         s.send(command)
         matchedFiles=s.recv(1024)
         print matchedFiles
+
     if 'FileHash' in command:
         if command.split(' ')[1]=='verify':
             s.send('verify '+command.split(' ')[2])
@@ -60,15 +68,14 @@ while True:
             s.send('checkall')
         res=s.recv(1024)
         print res
+
     if command=='exit':
     	s.send('exit')
         break
-    elif command=='Download mytext.txt':
+
+    if command=='Download mytext.txt':
         filename='fromserver.txt'
         s.send("Download mytext.txt")
-        #checkvalue = s.recv(1024)
-        #filename = checkvalue.split('  ')[1]+'1'
-        #checkvalue = checkvalue.split('  ')[0]
         with open(filename, 'wb') as f:
             print 'file opened'
             while True:
@@ -84,13 +91,8 @@ while True:
         md5=calculateMD5Sum(filename)
         servermd5=s.recv(1024)
         if servermd5==md5:
-            print "Thope ayyav ga"
+            print "File downloaded successfully"
         else:
-            print "pulka raja"
-#        (status,output)=commands.getstatusoutput('md5sum %s' %(filename))
-#        if(checkvalue==output.split('  ')[0]):
-#	    print 'File Transfered properly'
-# print output.split('  ')[0]
-#print('Successfully get the file')
+            print "File download not successful.Retry :("
 s.close()
 print('connection closed')
