@@ -39,6 +39,11 @@ while True:
         #print "In if '%s' " %data
         continue
     print('Server received', data)
+    files=showFiles()
+    allFiles=files.split('\n')
+    for i in allFiles:
+        if i!='':
+            fileInfo[i]=[calculateMD5Sum(i),time.ctime(os.path.getmtime(i))]
     if data=='ls':
         fileList=showFiles()
         conn.send(fileList)
@@ -46,11 +51,6 @@ while True:
         details=showDetails()
         conn.send(details)
     if 'verify' in data:
-        files=showFiles()
-        allFiles=files.split('\n')
-        for i in allFiles:
-            if i!='':
-                fileInfo[i]=[calculateMD5Sum(i),time.ctime(os.path.getmtime(i))]
         """f=open('details','r')
         total=f.readlines()
         f.close()
@@ -63,6 +63,15 @@ while True:
             detailFile.close()"""
         sendTo=fileInfo[data.split(' ')[1]]
         conn.send(sendTo[0]+sendTo[1])
+    if 'checkall' in data:
+        info=fileInfo.values()
+        names=fileInfo.keys()
+        string=""
+        count=0
+        for i in info:
+            string+=names[count]+' '+str(i)+'\n'
+            count+=1
+        conn.send(string)
     elif data.split(' ')[0]=='Download':
         filename=data.split(' ')[1]
         f = open(filename,'rb')
