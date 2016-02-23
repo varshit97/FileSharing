@@ -68,13 +68,18 @@ while True:
         conn.send("ty")
         end = conn.recv(1024)
         files = [f for f in glob.glob(os.path.join(mypath, "*")) if test(f,int(start),int(end))]
-        print files
+        for i in range(len(files)):
+            (status,output)=commands.getstatusoutput('ls -l %s'%(files[i]))
+            if(output[0]=='-'):
+                output += "   File"
+            else:
+                output += "   Folder"
+            files[i]=output
         for i in range(len(files)):
             conn.send(files[i])
             print conn.recv(1024)
             print('Sent ',files[i])
         conn.send('0')
-        print start," ",end
 
     elif data=='ls -l':
         details=showDetails()
