@@ -61,7 +61,7 @@ while True:
         fileList=showFiles()
         conn.send(fileList)
 
-    if data=="shortlist":
+    elif data=="shortlist":
         conn.send("ty")
         start = conn.recv(1024)
         conn.send("ty")
@@ -75,11 +75,11 @@ while True:
         conn.send('0')
         print start," ",end
 
-    if data=='ls -l':
+    elif data=='ls -l':
         details=showDetails()
         conn.send(details)
 
-    if 'regex' in data:
+    elif 'regex' in data:
         matchedFiles=''
         regex=data.split(' ')[2]
         checkMatch=re.compile(regex)
@@ -89,7 +89,7 @@ while True:
                 matchedFiles+=i+'\n'
         conn.send(matchedFiles)
 
-    if 'verify' in data:
+    elif 'verify' in data:
         """f=open('details','r')
         total=f.readlines()
         f.close()
@@ -103,7 +103,7 @@ while True:
         sendTo=fileInfo[data.split(' ')[1]]
         conn.send(sendTo[0]+sendTo[1])
 
-    if 'checkall' in data:
+    elif 'checkall' in data:
         info=fileInfo.values()
         names=fileInfo.keys()
         string=""

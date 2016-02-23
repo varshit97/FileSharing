@@ -23,12 +23,11 @@ requests=[]
 
 s.connect((x, port))
 
+
+
 while True:
     #Take input
     command=raw_input("Enter Command : ")
-
-    #Store requests
-    requests.append(command)
 
     #Handle requests
     if 'IndexGet shortlist' in command:
@@ -49,31 +48,36 @@ while True:
                 if(data=='0'):
                     break
                 print(data)
+        requests.append(command)
         print
 
-    if command=='IndexGet longlist':
+    elif command=='IndexGet longlist':
         s.send("ls -l")
         details=s.recv(1024)
+        requests.append(command)
         print details
 
-    if 'IndexGet regex' in command:
+    elif 'IndexGet regex' in command:
         s.send(command)
         matchedFiles=s.recv(1024)
+        requests.append(command)
         print matchedFiles
 
-    if 'FileHash' in command:
+    elif 'FileHash' in command:
         if command.split(' ')[1]=='verify':
             s.send('verify '+command.split(' ')[2])
         elif command.split(' ')[1]=='checkall':
             s.send('checkall')
         res=s.recv(1024)
+        requests.append(command)
         print res
 
-    if command=='exit':
+    elif command=='exit':
+        requests.append(command)
     	s.send('exit')
         break
 
-    if command=='Download mytext.txt':
+    elif command=='Download mytext.txt':
         filename='fromserver.txt'
         s.send("Download mytext.txt")
         with open(filename, 'wb') as f:
@@ -94,5 +98,10 @@ while True:
             print "File downloaded successfully"
         else:
             print "File download not successful.Retry :("
+        requests.append(command)
+
+    else:
+        print "Not a correct command try again"
+
 s.close()
 print('connection closed')
