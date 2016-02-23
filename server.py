@@ -45,7 +45,7 @@ while True:
     if data=='ls -l':
         details=showDetails()
         conn.send(details)
-    if 'check' in data:
+    if 'verify' in data:
         files=showFiles()
         allFiles=files.split('\n')
         for i in allFiles:

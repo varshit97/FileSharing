@@ -25,16 +25,19 @@ s.connect((x, port))
 while True:
     command=raw_input("Enter Command : ")
     requests.append(command)
-    if command=='ls':
+    if command=='IndexGet shortlist':
         s.send("ls")
         lsoutput = s.recv(1024) 
         print lsoutput
-    if command=='ls -l':
+    if command=='IndexGet longlist':
         s.send("ls -l")
         details=s.recv(1024)
         print details
-    if command.split(' ')[0]=='check':
-        s.send(command)
+    if 'FileHash' in command:
+        if command.split(' ')[1]=='verify':
+            s.send('verify '+command.split(' ')[2])
+        elif command.split(' ')[1]=='checkall':
+            s.send('checkall')
         res=s.recv(1024)
         print res
     if command=='exit':
