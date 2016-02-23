@@ -16,7 +16,7 @@ x=str(x.groups(1))[2:-3]
 
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
-port = 60001                    # Reserve a port for your service.
+port = 60002                    # Reserve a port for your service.
 
 requests=[]
 

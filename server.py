@@ -17,7 +17,7 @@ def showDetails():
     res=Popen(['ls','-l'],stdout=PIPE)
     return res.stdout.read()
 
-port = 60001                    # Reserve a port for your service.
+port = 60002                    # Reserve a port for your service.
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
 s.bind(('0.0.0.0', port))            # Bind to the port
@@ -83,4 +83,5 @@ while True:
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # conn.send('Thank you for connecting')
 conn.close()
+
 
