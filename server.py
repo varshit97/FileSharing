@@ -119,8 +119,6 @@ while True:
         l = f.read(1024)
         while(l):
             conn.send(l)
-            # conn.close()
-            # conn, addr = s.accept()
             print conn.recv(1024)
             print('Sent ',repr(l))
             l = f.read(1024)
@@ -132,7 +130,6 @@ while True:
         print('Done sending')
 
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # conn.send('Thank you for connecting')
 conn.close()
 
 

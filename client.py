@@ -77,9 +77,9 @@ while True:
     	s.send('exit')
         break
 
-    elif command=='Download mytext.txt':
-        filename='fromserver.txt'
-        s.send("Download mytext.txt")
+    elif command.split(' ')[0]=='Download':
+        filename = "fromserver.txt"
+        s.send(command)
         with open(filename, 'wb') as f:
             print 'file opened'
             while True:
