@@ -4,6 +4,7 @@ from subprocess import Popen,PIPE
 import socket                   # Import socket module
 import commands
 import os.path, time
+import re
 
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
@@ -50,6 +51,15 @@ while True:
     if data=='ls -l':
         details=showDetails()
         conn.send(details)
+    if 'regex' in data:
+        matchedFiles=''
+        regex=data.split(' ')[2]
+        checkMatch=re.compile(regex)
+        for i in allFiles:
+            matched=checkMatch.findall(i)
+            if matched:
+                matchedFiles+=i+'\n'
+        conn.send(matchedFiles)
     if 'verify' in data:
         """f=open('details','r')
         total=f.readlines()

@@ -33,6 +33,10 @@ while True:
         s.send("ls -l")
         details=s.recv(1024)
         print details
+    if 'IndexGet regex' in command:
+        s.send(command)
+        matchedFiles=s.recv(1024)
+        print matchedFiles
     if 'FileHash' in command:
         if command.split(' ')[1]=='verify':
             s.send('verify '+command.split(' ')[2])
