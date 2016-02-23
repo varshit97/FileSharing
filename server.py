@@ -39,7 +39,7 @@ print 'Server listening....'
 conn, addr = s.accept()     # Establish connection with client.
 fileInfo={}
 times=[]
-
+history=[]
 while True:
     #print 'Got connection from', addr
     #Data sent from clientside
@@ -48,6 +48,7 @@ while True:
         conn, addr = s.accept()     # Establish connection with client.
         continue
     print('Server received', data)
+    history.append('data')
 
     #Files Information
     files=showFiles()
