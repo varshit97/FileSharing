@@ -5,6 +5,15 @@ import socket                   # Import socket module
 import commands
 import os.path, time
 import re
+import os.path, time, glob
+
+mypath = "/home/ramkumar/cn_assi/FileSharing"
+
+def test(f,start,end):
+    if (not os.path.isfile(f)):
+        return 0
+    (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(f)
+    return start<=ctime and end>=ctime
 
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
@@ -18,7 +27,7 @@ def showDetails():
     res=Popen(['ls','-l'],stdout=PIPE)
     return res.stdout.read()
 
-port = 60001                    # Reserve a port for your service.
+port = 60002                    # Reserve a port for your service.
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
 s.bind(('0.0.0.0', port))            # Bind to the port
@@ -48,6 +57,19 @@ while True:
     if data=='ls':
         fileList=showFiles()
         conn.send(fileList)
+    if data=="shortlist":
+        conn.send("ty")
+        start = conn.recv(1024)
+        conn.send("ty")
+        end = conn.recv(1024)
+        files = [f for f in glob.glob(os.path.join(mypath, "*")) if test(f,int(start),int(end))]
+        print files
+        for i in range(len(files)):
+            conn.send(files[i])
+            print conn.recv(1024)
+            print('Sent ',files[i])
+        conn.send('0')
+        print start," ",end
     if data=='ls -l':
         details=showDetails()
         conn.send(details)
@@ -102,4 +124,5 @@ while True:
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # conn.send('Thank you for connecting')
 conn.close()
+
 
