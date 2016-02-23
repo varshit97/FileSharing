@@ -1,8 +1,9 @@
 # client.py
 
 import socket                   # Import socket module
-import commands
-import re
+import commands,calendar
+from datetime import datetime
+import re,glob
 
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
@@ -25,10 +26,25 @@ s.connect((x, port))
 while True:
     command=raw_input("Enter Command : ")
     requests.append(command)
-    if command=='IndexGet shortlist':
-        s.send("ls")
-        lsoutput = s.recv(1024) 
-        print lsoutput
+    if 'IndexGet shortlist' in command:
+        command = command.split(" ")
+        start = command[2]+" "+command[3]
+        end = command[4]+" "+command[5]
+        timefmt = "%Y%m%d %H:%M:%S"
+        start = calendar.timegm(datetime.strptime(start, timefmt).timetuple())
+        end = calendar.timegm(datetime.strptime(end, timefmt).timetuple())
+        s.send("shortlist")
+        s.recv(1024)
+        s.send(str(start))
+        s.recv(1024)
+        s.send(str(end))
+        while True:
+                data = s.recv(1024)
+                s.send('new')
+                if(data=='0'):
+                    break
+                print(data)
+        print
     if command=='IndexGet longlist':
         s.send("ls -l")
         details=s.recv(1024)
