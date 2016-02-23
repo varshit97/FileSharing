@@ -18,10 +18,13 @@ s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
 port = 60001                    # Reserve a port for your service.
 
+requests=[]
+
 s.connect((x, port))
 
 while True:
     command=raw_input("Enter Command : ")
+    requests.append(command)
     if command=='ls':
         s.send("ls")
         lsoutput = s.recv(1024) 
@@ -30,6 +33,10 @@ while True:
         s.send("ls -l")
         details=s.recv(1024)
         print details
+    if command.split(' ')[0]=='check':
+        s.send(command)
+        res=s.recv(1024)
+        print res
     if command=='exit':
     	s.send('exit')
         break

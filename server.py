@@ -3,7 +3,7 @@
 from subprocess import Popen,PIPE
 import socket                   # Import socket module
 import commands
-
+import os.path, time
 
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
@@ -27,6 +27,8 @@ empty=''              # Now wait for client connection.
 print 'Server listening....'
 
 conn, addr = s.accept()     # Establish connection with client.
+fileInfo={}
+times=[]
 
 while True:
     #print 'Got connection from', addr
@@ -43,6 +45,24 @@ while True:
     if data=='ls -l':
         details=showDetails()
         conn.send(details)
+    if 'check' in data:
+        files=showFiles()
+        allFiles=files.split('\n')
+        for i in allFiles:
+            if i!='':
+                fileInfo[i]=[calculateMD5Sum(i),time.ctime(os.path.getmtime(i))]
+        """f=open('details','r')
+        total=f.readlines()
+        f.close()
+        filesCount=len(files.split('\n'))-1
+        if total[0]<filesCount:
+            detailFile=open('details','w')
+            detailFile.truncate()
+            detailFile.write(filesCount)
+            detailFile.write('vish pandu\n')
+            detailFile.close()"""
+        sendTo=fileInfo[data.split(' ')[1]]
+        conn.send(sendTo[0]+sendTo[1])
     elif data.split(' ')[0]=='Download':
         filename=data.split(' ')[1]
         f = open(filename,'rb')
