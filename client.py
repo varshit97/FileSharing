@@ -1,6 +1,6 @@
 # client.py
 
-import socket                   # Import socket module
+import socket                                                   # Import socket module
 import commands,calendar
 from datetime import datetime
 import re,glob
@@ -8,7 +8,6 @@ import re,glob
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
     return str(output.split('  ')[0])
-
 
 (status,output)=commands.getstatusoutput('ifconfig')
 output=str(output)
@@ -19,20 +18,21 @@ port = 60001                                                    # Reserve a port
 
 requests=[]
 
-protocol=raw_input("1)TCP   2)UDP\n")
+serverIp=raw_input("Enter IP of server: ")
+protocol=raw_input("Press 1 for TCP and 2 for UDP: ")
 
 if protocol=='1':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Create a socket object
     host = socket.gethostname()                                 # Get local machine name
-    s.connect((x, port))
+    s.connect((serverIp, port))
     s.send('1')
 else:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Create a socket object
-    s.connect((x, port))
+    s.connect((serverIp, port))
     s.send('2')
     s.close()
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
-    s.connect((x, 60002))
+    s.connect((serverIp, 60002))
 
 def sendInfo(tcporudp,data):
     if tcporudp=='1':
@@ -105,7 +105,6 @@ while True:
         break
 
     elif command.split(' ')[0]=='Download':
-        # filename = "fromserver.txt"   
         filename = command.split(' ')[1]
         sendInfo(protocol,command)
         with open(filename, 'wb') as f:
@@ -120,7 +119,6 @@ while True:
                 print('data=%s', (data))
                 if(data=='1'+'9'+'8'+'3'):
                     break
-                # write data to a file
                 f.write(data)
         f.close()
         if(data=='Invalid'):

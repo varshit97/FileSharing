@@ -15,6 +15,7 @@ def test(f,start,end):
         return start<=ctime and end>=ctime
     else:
         return 0
+
 def checkfilepath(filename,mypath):
     output = showallfolders(mypath)
     files=[]
@@ -53,7 +54,10 @@ u = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket ob
 u.bind(('0.0.0.0',60002))                                   # Bind to the port
 
 print 'Server listening....'
+
 addr2 = None
+
+#Identify if user asked for TCP or UDP
 conn, addr1 = s.accept()                                     # Establish connection with client.
 temp=conn.recv(1024)
 if temp=='1':
@@ -79,7 +83,6 @@ times=[]
 history=[]
 
 while True:
-    #print 'Got connection from', addr
     #Data sent from clientside
     if protocol=='1':
         data = recvInfo(protocol,1024)
@@ -97,7 +100,6 @@ while True:
     history.append('data')
 
     #Files Information
-
     output = showallfolders(mypath)
     files=[]
     for w in range(len(output)):
@@ -120,6 +122,7 @@ while True:
         start = recvInfo(protocol,1024)
         sendInfo(protocol,"ty")
         end = recvInfo(protocol,1024)
+
         # find . -type d -name "*" -print
         output = showallfolders(mypath)
         files=[]
@@ -160,22 +163,12 @@ while True:
         sendInfo(protocol,matchedFiles)
 
     elif 'verify' in data:
-        """f=open('details','r')
-        total=f.readlines()
-        f.close()
-        filesCount=len(files.split('\n'))-1
-        if total[0]<filesCount:
-            detailFile=open('details','w')
-               detailFile.truncate()
-            detailFile.write(filesCount)
-            detailFile.write('vish pandu\n')
-            detailFile.close()"""
         if calculateMD5Sum(data.split(' ')[2])==data.split(' ')[1]:
             sendInfo(protocol,'1')
         else:
             sendInfo(protocol,'0')
-        # sendTo=fileInfo[data.split(' ')[1]]
-        # sendInfo(sendTo[0]+sendTo[1])
+        #sendTo=fileInfo[data.split(' ')[1]]
+        #sendInfo(sendTo[0]+sendTo[1])
 
     elif 'checkall' in data:
         info=fileInfo.values()
@@ -204,11 +197,8 @@ while True:
         sendInfo(protocol,'1983')
         f.close()
         msum = calculateMD5Sum(filename)
-        # print msum
         sendInfo(msum)
         print('Done sending')
 
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 conn.close()
-
-
