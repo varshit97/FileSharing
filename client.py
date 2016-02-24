@@ -15,20 +15,41 @@ output=str(output)
 x = re.search(r'inet addr:(\S+)',output)
 x=str(x.groups(1))[2:-3]
 
-s = socket.socket()             # Create a socket object
-host = socket.gethostname()     # Get local machine name
-port = 60001                    # Reserve a port for your service.
+port = 60001                                                    # Reserve a port for your service.
 
 requests=[]
 
-s.connect((x, port))
+protocol=raw_input("1)TCP   2)UDP\n")
 
+if protocol=='1':
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Create a socket object
+    host = socket.gethostname()                                 # Get local machine name
+    s.connect((x, port))
+    s.send('1')
+else:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Create a socket object
+    s.connect((x, port))
+    s.send('2')
+    s.close()
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
+    s.connect((x, 60002))
 
+def sendInfo(tcporudp,data):
+    if tcporudp=='1':
+        s.send(data)
+    elif tcporudp=='2':
+        s.sendto(data,('10.1.39.145',60002))
+
+def recvInfo(tcporudp,data):
+    if tcporudp=='1':
+        getData=s.recv(data)
+    elif tcporudp=='2':
+        getData,addr=s.recvfrom(data)
+    return getData
 
 while True:
     #Take input
     command=raw_input("Enter Command : ")
-    requests.append(command)
 
     #Handle requests
     if 'IndexGet shortlist' in command:
@@ -38,14 +59,14 @@ while True:
         timefmt = "%Y%m%d %H:%M:%S"
         start = calendar.timegm(datetime.strptime(start, timefmt).timetuple())
         end = calendar.timegm(datetime.strptime(end, timefmt).timetuple())
-        s.send("shortlist")
-        s.recv(1024)
-        s.send(str(start))
-        s.recv(1024)
-        s.send(str(end))
+        sendInfo(protocol,'shortlist')
+        recvInfo(protocol,1024)
+        sendInfo(protocol,str(start))
+        recvInfo(protocol,1024)
+        sendInfo(protocol,str(end))
         while True:
-                data = s.recv(1024)
-                s.send('new')
+                data = recvInfo(protocol,1024)
+                sendInfo(protocol,'new')
                 if(data=='0'):
                     break
                 print(data)
@@ -57,45 +78,45 @@ while True:
         print
 
     elif command=='IndexGet longlist':
-        s.send("ls -lR")
-        details=s.recv(1024)
+        sendInfo(protocol,'ls -lR')
+        details=recvInfo(protocol,1024)
         print details
 
     elif 'IndexGet regex' in command:
-        s.send(command)
-        matchedFiles=s.recv(1024)
+        sendInfo(protocol,command)
+        matchedFiles=recvInfo(protocol,1024)
         print matchedFiles
 
     elif 'FileHash' in command:
         if command.split(' ')[1]=='verify':
-            s.send('verify '+calculateMD5Sum(command.split(' ')[2])+' '+command.split(' ')[2])
-            res=int(s.recv(1024))
+            sendInfo(protocol,'verify '+calculateMD5Sum(command.split(' ')[2])+' '+command.split(' ')[2])
+            res=int(recvInfo(protocol,1024))
             if(res==1):
                 print "You are up-to-date"
             else:
                 print "You are not up-to-date"
         elif command.split(' ')[1]=='checkall':
-            s.send('checkall')
-            res=s.recv(1024)
+            sendInfo(protocol,'checkall')
+            res=recvInfo(protocol,1024)
             print res
 
     elif command=='exit':
-        s.send('exit')
+        sendInfo(protocol,'exit')
         break
 
     elif command.split(' ')[0]=='Download':
         # filename = "fromserver.txt"   
         filename = command.split(' ')[1]
-        s.send(command)
+        sendInfo(protocol,command)
         with open(filename, 'wb') as f:
             print 'file opened'
             while True:
                 print('receiving data...')
-                data = s.recv(1024)
+                data = recvInfo(protocol,1024)
                 if data=='Invalid':
                     print "Invaid File given"
                     break
-                s.send('new')
+                sendInfo(protocol,'new')
                 print('data=%s', (data))
                 if(data=='1'+'9'+'8'+'3'):
                     break
@@ -105,7 +126,7 @@ while True:
         if(data=='Invalid'):
             continue
         md5=calculateMD5Sum(filename)
-        servermd5=s.recv(1024)
+        servermd5=recvInfo(protocol,1024)
         if servermd5==md5:
             print "File downloaded successfully"
         else:

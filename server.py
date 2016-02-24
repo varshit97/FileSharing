@@ -7,8 +7,8 @@ import os.path, time, glob
 import re
 import os
 
-# mypath = os.getcwd()
-mypath = ['/home/ramkumar/cn_assi/FileSharing/']
+mypath = os.getcwd()
+
 def test(f,start,end):
     if os.path.isfile(f):
         mode,ino,dev,nlink,uid,gid,size,atime,mtime,ctime=os.stat(f)
@@ -27,7 +27,6 @@ def checkfilepath(filename,mypath):
             return 1
     return 0
 
-
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
     return str(output.split('  ')[0])
@@ -45,26 +44,55 @@ def showallfolders(mypath):
     output=output.split('\n')
     return output
 
-port = 60001                    # Reserve a port for your service.
-s = socket.socket()             # Create a socket object
-host = socket.gethostname()     # Get local machine name
-s.bind(('0.0.0.0', port))            # Bind to the port
+port = 60001                                                # Reserve a port for your service.
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Create a socket object
+host = socket.gethostname()                                 # Get local machine name
+s.bind(('0.0.0.0', port))                                   # Bind to the port
 s.listen(5)       
-empty=''              # Now wait for client connection.
+u = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)        # Create a socket object
+u.bind(('0.0.0.0',60002))                                   # Bind to the port
 
 print 'Server listening....'
+addr2 = None
+conn, addr1 = s.accept()                                     # Establish connection with client.
+temp=conn.recv(1024)
+if temp=='1':
+    protocol='1'
+if temp=='2':
+    protocol='2'
 
-conn, addr = s.accept()     # Establish connection with client.
+def sendInfo(tcporudp,data):
+    if tcporudp=='1':
+        conn.send(data)
+    elif tcporudp=='2':
+        u.sendto(data,addr2)
+
+def recvInfo(tcporudp,data):
+    if tcporudp=='1':
+        getData=conn.recv(data)
+    elif tcporudp=='2':
+        getData=u.recvfrom(data)
+    return getData
+
 fileInfo={}
 times=[]
 history=[]
+
 while True:
     #print 'Got connection from', addr
     #Data sent from clientside
-    data = conn.recv(1024)
+    if protocol=='1':
+        data = recvInfo(protocol,1024)
+    if protocol=='2':
+        data,addr = recvInfo(protocol,1024)
+        addr2 = addr
     if not data:
-        conn, addr = s.accept()     # Establish connection with client.
+        if protocol=='1':
+            conn, addr = s.accept()                             # Establish connection with client.
+        if protocol=='2':
+            data = recvInfo(protocol,1024)
         continue
+
     print('Server received', data)
     history.append('data')
 
@@ -85,13 +113,13 @@ while True:
     #Handling requests
     if data=='ls':
         fileList=showFiles()
-        conn.send(fileList)
+        sendInfo(protocol,fileList)
 
     elif data=="shortlist":
-        conn.send("ty")
-        start = conn.recv(1024)
-        conn.send("ty")
-        end = conn.recv(1024)
+        sendInfo(protocol,"ty")
+        start = recvInfo(protocol,1024)
+        sendInfo(protocol,"ty")
+        end = recvInfo(protocol,1024)
         # find . -type d -name "*" -print
         output = showallfolders(mypath)
         files=[]
@@ -106,14 +134,14 @@ while True:
                 output += "   Folder"
             files[i]=output
         for i in range(len(files)):
-            conn.send(files[i])
-            print conn.recv(1024)
+            sendInfo(protocol,files[i])
+            print recvInfo(protocol,1024)
             print('Sent ',files[i])
-        conn.send('0')
+        sendInfo(protocol,'0')
 
     elif data=='ls -lR':
         details=showDetails()
-        conn.send(details)
+        sendInfo(protocol,details)
 
     elif 'regex' in data.split(' '):
         matchedFiles=''
@@ -121,7 +149,7 @@ while True:
         try:
             checkMatch=re.compile(regex)
         except:
-            conn.send("Invalid regex")
+            sendInfo(protocol,"Invalid regex")
             continue
         for yy in range(len(files)):
             files[yy] = files[yy].split('/')[-1]
@@ -129,7 +157,7 @@ while True:
             matched=checkMatch.findall(i)
             if matched:
                 matchedFiles+=i+'\n'
-        conn.send(matchedFiles)
+        sendInfo(protocol,matchedFiles)
 
     elif 'verify' in data:
         """f=open('details','r')
@@ -143,11 +171,11 @@ while True:
             detailFile.write('vish pandu\n')
             detailFile.close()"""
         if calculateMD5Sum(data.split(' ')[2])==data.split(' ')[1]:
-            conn.send('1')
+            sendInfo(protocol,'1')
         else:
-            conn.send('0')
+            sendInfo(protocol,'0')
         # sendTo=fileInfo[data.split(' ')[1]]
-        # conn.send(sendTo[0]+sendTo[1])
+        # sendInfo(sendTo[0]+sendTo[1])
 
     elif 'checkall' in data:
         info=fileInfo.values()
@@ -157,27 +185,27 @@ while True:
         for i in info:
             string+=names[count]+' '+str(i)+'\n'
             count+=1
-        conn.send(string)
+        sendInfo(protocol,string)
 
     elif data.split(' ')[0]=='Download':
         validfile=0
         filename=data.split(' ')[1]
         validfile = checkfilepath(filename,mypath)
         if(validfile==0):
-            conn.send('Invalid')
+            sendInfo(protocol,'Invalid')
             continue
         f = open(filename,'rb')
         l = f.read(1024)
         while(l):
-            conn.send(l)
-            print conn.recv(1024)
+            sendInfo(protocol,l)
+            print recvInfo(protocol,1024)
             print('Sent ',repr(l))
             l = f.read(1024)
-        conn.send('1983')
+        sendInfo(protocol,'1983')
         f.close()
         msum = calculateMD5Sum(filename)
         # print msum
-        conn.send(msum)
+        sendInfo(msum)
         print('Done sending')
 
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
