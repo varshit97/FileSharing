@@ -69,6 +69,13 @@ while True:
     history.append('data')
 
     #Files Information
+
+    output = showallfolders(mypath)
+    files=[]
+    for w in range(len(output)):
+        tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
+        files+=tempfiles
+
     files=showFiles()
     allFiles=files.split('\n')
     for i in allFiles:
@@ -108,7 +115,7 @@ while True:
         details=showDetails()
         conn.send(details)
 
-    elif 'regex' in data:
+    elif 'regex' in data.split(' '):
         matchedFiles=''
         regex=data.split(' ')[2]
         try:
@@ -116,7 +123,9 @@ while True:
         except:
             conn.send("Invalid regex")
             continue
-        for i in allFiles:
+        for yy in range(len(files)):
+            files[yy] = files[yy].split('/')[-1]
+        for i in files:
             matched=checkMatch.findall(i)
             if matched:
                 matchedFiles+=i+'\n'
@@ -133,8 +142,12 @@ while True:
             detailFile.write(filesCount)
             detailFile.write('vish pandu\n')
             detailFile.close()"""
-        sendTo=fileInfo[data.split(' ')[1]]
-        conn.send(sendTo[0]+sendTo[1])
+        if calculateMD5Sum(data.split(' ')[2])==data.split(' ')[1]:
+            conn.send('1')
+        else:
+            conn.send('0')
+        # sendTo=fileInfo[data.split(' ')[1]]
+        # conn.send(sendTo[0]+sendTo[1])
 
     elif 'checkall' in data:
         info=fileInfo.values()

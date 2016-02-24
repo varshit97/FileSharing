@@ -68,18 +68,22 @@ while True:
 
     elif 'FileHash' in command:
         if command.split(' ')[1]=='verify':
-            s.send('verify '+command.split(' ')[2])
+            s.send('verify '+calculateMD5Sum(command.split(' ')[2])+' '+command.split(' ')[2])
         elif command.split(' ')[1]=='checkall':
             s.send('checkall')
-        res=s.recv(1024)
-        print res
+        res=int(s.recv(1024))
+        if(res==1):
+            print "You are up-to-date"
+        else:
+            print "You are not up-to-date"
 
     elif command=='exit':
-    	s.send('exit')
+        s.send('exit')
         break
 
     elif command.split(' ')[0]=='Download':
-        filename = "fromserver.txt"
+        # filename = "fromserver.txt"   
+        filename = command.split(' ')[1]
         s.send(command)
         with open(filename, 'wb') as f:
             print 'file opened'
