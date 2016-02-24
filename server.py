@@ -111,7 +111,11 @@ while True:
     elif 'regex' in data:
         matchedFiles=''
         regex=data.split(' ')[2]
-        checkMatch=re.compile(regex)
+        try:
+            checkMatch=re.compile(regex)
+        except:
+            conn.send("Invalid regex")
+            continue
         for i in allFiles:
             matched=checkMatch.findall(i)
             if matched:
