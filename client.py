@@ -1,5 +1,6 @@
 # client.py
 
+#Imports
 import socket                                                   # Import socket module
 import commands,calendar
 from datetime import datetime
@@ -50,6 +51,9 @@ def recvInfo(tcporudp,data):
 while True:
     #Take input
     command=raw_input("Enter Command : ")
+    
+    #Storing requests
+    requests.append(command)
 
     #Handle requests
     if 'IndexGet shortlist' in command:

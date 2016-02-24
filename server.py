@@ -1,5 +1,6 @@
 # server.py
 
+#Imports
 from subprocess import Popen,PIPE
 import socket                   # Import socket module
 import commands
