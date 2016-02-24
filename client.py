@@ -69,13 +69,15 @@ while True:
     elif 'FileHash' in command:
         if command.split(' ')[1]=='verify':
             s.send('verify '+calculateMD5Sum(command.split(' ')[2])+' '+command.split(' ')[2])
+            res=int(s.recv(1024))
+            if(res==1):
+                print "You are up-to-date"
+            else:
+                print "You are not up-to-date"
         elif command.split(' ')[1]=='checkall':
             s.send('checkall')
-        res=int(s.recv(1024))
-        if(res==1):
-            print "You are up-to-date"
-        else:
-            print "You are not up-to-date"
+            res=s.recv(1024)
+            print res
 
     elif command=='exit':
         s.send('exit')
@@ -95,7 +97,7 @@ while True:
                     break
                 s.send('new')
                 print('data=%s', (data))
-                if(data=='1983'):
+                if(data=='1'+'9'+'8'+'3'):
                     break
                 # write data to a file
                 f.write(data)
