@@ -9,13 +9,23 @@ import os
 
 # mypath = os.getcwd()
 mypath = ['/home/ramkumar/cn_assi/FileSharing/']
-print mypath,"  dfv"
 def test(f,start,end):
     if os.path.isfile(f):
         mode,ino,dev,nlink,uid,gid,size,atime,mtime,ctime=os.stat(f)
         return start<=ctime and end>=ctime
     else:
         return 0
+def checkfilepath(filename,mypath):
+    output = showallfolders(mypath)
+    files=[]
+    for w in range(len(output)):
+        tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
+        files+=tempfiles
+    for i in range(len(files)):
+        if filename in files[i]:
+            print files[i]
+            return 1
+    return 0
 
 
 def calculateMD5Sum(fileName):
@@ -29,6 +39,11 @@ def showFiles():
 def showDetails():
     res=Popen(['ls','-lR'],stdout=PIPE)
     return res.stdout.read()
+
+def showallfolders(mypath):
+    (status,output)=commands.getstatusoutput('find %s -not -path "*/\.*" -type d' %(mypath[0]))
+    output=output.split('\n')
+    return output
 
 port = 60001                    # Reserve a port for your service.
 s = socket.socket()             # Create a socket object
@@ -71,12 +86,11 @@ while True:
         conn.send("ty")
         end = conn.recv(1024)
         # find . -type d -name "*" -print
-        (status,output)=commands.getstatusoutput('find %s -not -path "*/\.*" -type d' %(mypath[0]))
-        output=output.split('\n')
+        output = showallfolders(mypath)
         files=[]
         for w in range(len(output)):
             tempfiles = [f for f in glob.glob(os.path.join(output[w], "*")) if test(f,int(start),int(end))]
-            files+=tempfiles
+            files+=tempfiles        
         for i in range(len(files)):
             (status,output)=commands.getstatusoutput('ls -l %s'%(files[i]))
             if(output[0]=='-'):
@@ -129,7 +143,12 @@ while True:
         conn.send(string)
 
     elif data.split(' ')[0]=='Download':
+        validfile=0
         filename=data.split(' ')[1]
+        validfile = checkfilepath(filename,mypath)
+        if(validfile==0):
+            conn.send('Invalid')
+            continue
         f = open(filename,'rb')
         l = f.read(1024)
         while(l):

@@ -86,6 +86,9 @@ while True:
             while True:
                 print('receiving data...')
                 data = s.recv(1024)
+                if data=='Invalid':
+                    print "Invaid File given"
+                    break
                 s.send('new')
                 print('data=%s', (data))
                 if(data=='1983'):
@@ -93,6 +96,8 @@ while True:
                 # write data to a file
                 f.write(data)
         f.close()
+        if(data=='Invalid'):
+            continue
         md5=calculateMD5Sum(filename)
         servermd5=s.recv(1024)
         if servermd5==md5:
