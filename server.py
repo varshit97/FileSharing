@@ -7,13 +7,16 @@ import os.path, time, glob
 import re
 import os
 
-mypath = os.getcwd()
-
+# mypath = os.getcwd()
+mypath = ['/home/ramkumar/cn_assi/FileSharing/']
+print mypath,"  dfv"
 def test(f,start,end):
-    if not os.path.isfile(f):
+    if os.path.isfile(f):
+        mode,ino,dev,nlink,uid,gid,size,atime,mtime,ctime=os.stat(f)
+        return start<=ctime and end>=ctime
+    else:
         return 0
-    mode,ino,dev,nlink,uid,gid,size,atime,mtime,ctime=os.stat(f)
-    return start<=ctime and end>=ctime
+
 
 def calculateMD5Sum(fileName):
     (status,output)=commands.getstatusoutput('md5sum %s'%(fileName))
@@ -24,7 +27,7 @@ def showFiles():
     return res.stdout.read()
 
 def showDetails():
-    res=Popen(['ls','-l'],stdout=PIPE)
+    res=Popen(['ls','-lR'],stdout=PIPE)
     return res.stdout.read()
 
 port = 60001                    # Reserve a port for your service.
@@ -67,7 +70,13 @@ while True:
         start = conn.recv(1024)
         conn.send("ty")
         end = conn.recv(1024)
-        files = [f for f in glob.glob(os.path.join(mypath, "*")) if test(f,int(start),int(end))]
+        # find . -type d -name "*" -print
+        (status,output)=commands.getstatusoutput('find %s -not -path "*/\.*" -type d' %(mypath[0]))
+        output=output.split('\n')
+        files=[]
+        for w in range(len(output)):
+            tempfiles = [f for f in glob.glob(os.path.join(output[w], "*")) if test(f,int(start),int(end))]
+            files+=tempfiles
         for i in range(len(files)):
             (status,output)=commands.getstatusoutput('ls -l %s'%(files[i]))
             if(output[0]=='-'):
@@ -81,7 +90,7 @@ while True:
             print('Sent ',files[i])
         conn.send('0')
 
-    elif data=='ls -l':
+    elif data=='ls -lR':
         details=showDetails()
         conn.send(details)
 
@@ -128,7 +137,7 @@ while True:
             print conn.recv(1024)
             print('Sent ',repr(l))
             l = f.read(1024)
-        conn.send('0')
+        conn.send('1983')
         f.close()
         msum = calculateMD5Sum(filename)
         # print msum

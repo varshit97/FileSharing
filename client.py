@@ -57,7 +57,7 @@ while True:
         print
 
     elif command=='IndexGet longlist':
-        s.send("ls -l")
+        s.send("ls -lR")
         details=s.recv(1024)
         print details
 
@@ -88,7 +88,7 @@ while True:
                 data = s.recv(1024)
                 s.send('new')
                 print('data=%s', (data))
-                if(data=='0'):
+                if(data=='1983'):
                     break
                 # write data to a file
                 f.write(data)
