@@ -39,7 +39,7 @@ def sendInfo(tcporudp,data):
     if tcporudp=='1':
         s.send(data)
     elif tcporudp=='2':
-        s.sendto(data,('10.1.39.145',60002))
+        s.sendto(data,(serverIp,60002))
 
 def recvInfo(tcporudp,data):
     if tcporudp=='1':

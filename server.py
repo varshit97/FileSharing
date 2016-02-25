@@ -68,6 +68,7 @@ if temp=='2':
 
 def sendInfo(tcporudp,data):
     if tcporudp=='1':
+        print data
         conn.send(data)
     elif tcporudp=='2':
         u.sendto(data,addr2)
@@ -198,7 +199,7 @@ while True:
         sendInfo(protocol,'1983')
         f.close()
         msum = calculateMD5Sum(filename)
-        sendInfo(msum)
+        sendInfo(protocol,msum)
         print('Done sending')
 
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
