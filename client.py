@@ -107,7 +107,13 @@ while True:
                 print "You are not up-to-date"
         elif command.split(' ')[1]=='checkall':
             sendInfo(protocol,'checkall')
-            res=recvInfo(protocol,1024)
+            res=''
+            while True:
+                tempvar=recvInfo(protocol,1024)
+                # print tempvar
+                if tempvar=='1'+'9'+'8'+'3':
+                    break
+                res+=tempvar
             print res
 
     elif command=='exit':

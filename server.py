@@ -110,8 +110,8 @@ output = showallfolders(mypath)
 files=[]
 for w in range(len(output)):
     tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
+    # (status,x)=commands.getstatusoutput('ls -l %s' %(tempfiles))
     files+=tempfiles
-print files
 
 while True:
     #Data sent from clientside
@@ -136,6 +136,7 @@ while True:
     # files=showFiles()
     # allFiles=files.split('\n')
     allFiles=files
+    print files
     for i in allFiles:
         if i!='':
             fileInfo[i]=[calculateMD5Sum(i),time.ctime(os.path.getmtime(i))]
@@ -157,15 +158,15 @@ while True:
         for w in range(len(output)):
             tempfiles = [f for f in glob.glob(os.path.join(output[w], "*")) if test(f,int(start),int(end))]
             shortfiles+=tempfiles        
-        for i in range(len(tempfiles)):
-            (status,output)=commands.getstatusoutput('ls -l %s'%(tempfiles[i]))
+        for i in range(len(shortfiles)):
+            (status,output)=commands.getstatusoutput('ls -l %s'%(shortfiles[i]))
             if(output[0]=='-'):
                 output += "   File"
             else:
                 output += "   Folder"
-            tempfiles[i]=output
-        for i in range(len(tempfiles)):
-            sendInfo(protocol,tempfiles[i])
+            shortfiles[i]=output
+        for i in range(len(shortfiles)):
+            sendInfo(protocol,shortfiles[i])
             print recvInfo(protocol,1024)
             print('Sent ',files[i])
         sendInfo(protocol,'0')
@@ -205,8 +206,10 @@ while True:
         string=""
         count=0
         for i in info:
-            string+=names[count]+' '+str(i)+'\n'
+            string=names[count]+' '+str(i)+'\n'
             count+=1
+            sendInfo(protocol,string)
+        string='1983'
         sendInfo(protocol,string)
 
     elif data.split(' ')[0]=='Download':
