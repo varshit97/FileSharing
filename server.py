@@ -6,7 +6,7 @@ import socket                   # Import socket module
 import commands
 import os.path, time, glob
 import re
-import os
+import os,magic
 
 mypath = os.getcwd()
 
@@ -38,8 +38,30 @@ def showFiles():
     return res.stdout.read()
 
 def showDetails():
-    res=Popen(['ls','-lR'],stdout=PIPE)
-    return res.stdout.read()
+    (status,res)=commands.getstatusoutput('ls -lR')
+    # res=Popen(['ls','-lR'],stdout=PIPE)
+    res=res.split('\n')
+    output=''
+    foldername=''
+    for i in range(len(res)):
+        if res[i]=='':
+            continue
+        if res[i][0]=='.':
+            foldername = res[i].split(':')[0][2:]
+        if(res[i][0]=='-' or res[i][0]=='d'):
+            if(foldername!=''):
+                filen = foldername+"/"+res[i].split(' ')[-1]
+            else:
+                filen = res[i].split(' ')[-1]
+            (status,times)=commands.getstatusoutput('stat %s | cut -d. -f1'%(filen))
+            (status,filetype)=commands.getstatusoutput('file --mime-type -b %s'%(filen))
+            times=times.split('\n')[5]
+            size = os.path.getsize(filen)
+            output+=filen+" "+str(size)+" "+times.split(':')[1]+" "+filetype+'\n' 
+        else:
+            output+=res[i]+'\n'
+
+    return output
 
 def showallfolders(mypath):
     (status,output)=commands.getstatusoutput('find %s -not -path "*/\.*" -type d' %(mypath))
