@@ -17,12 +17,16 @@ def test(f,start,end):
     else:
         return 0
 
-def checkfilepath(filename,mypath):
-    output = showallfolders(mypath)
-    files=[]
-    for w in range(len(output)):
-        tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
-        files+=tempfiles
+def checkfilepath(filename,mypath,files):
+    # output = showallfolders(mypath)
+    # files=[]
+    # for w in range(len(output)):
+    #     tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
+    #     files+=tempfiles
+    print files
+    print 
+    print filename
+    print 
     for i in range(len(files)):
         if filename in files[i]:
             print files[i]
@@ -111,7 +115,6 @@ files=[]
 for w in range(len(output)):
     templist=[]
     tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
-    print tempfiles
     for i in range(len(tempfiles)):
         if os.path.isfile(tempfiles[i]):
             templist.append(tempfiles[i])
@@ -140,7 +143,6 @@ while True:
     # files=showFiles()
     # allFiles=files.split('\n')
     allFiles=files
-    print files
     for i in allFiles:
         if i!='':
             fileInfo[i]=[calculateMD5Sum(i),time.ctime(os.path.getmtime(i))]
@@ -219,7 +221,7 @@ while True:
     elif data.split(' ')[0]=='Download':
         validfile=0
         filename=data.split(' ')[1]
-        validfile = checkfilepath(filename,mypath)
+        validfile = checkfilepath(filename,mypath,files)
         if(validfile==0):
             sendInfo(protocol,'Invalid')
             continue
