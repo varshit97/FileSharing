@@ -123,6 +123,7 @@ while True:
     elif command.split(' ')[0]=='Download':
         filename = command.split(' ')[1]
         sendInfo(protocol,command)
+        filename = filename.split('/')[-1]
         with open(filename, 'wb') as f:
             print 'file opened'
             while True:
