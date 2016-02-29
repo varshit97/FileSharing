@@ -84,6 +84,13 @@ fileInfo={}
 times=[]
 history=[]
 
+output = showallfolders(mypath)
+files=[]
+for w in range(len(output)):
+    tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
+    files+=tempfiles
+print files
+
 while True:
     #Data sent from clientside
     if protocol=='1':
@@ -102,14 +109,11 @@ while True:
     history.append('data')
 
     #Files Information
-    output = showallfolders(mypath)
-    files=[]
-    for w in range(len(output)):
-        tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
-        files+=tempfiles
+    
 
-    files=showFiles()
-    allFiles=files.split('\n')
+    # files=showFiles()
+    # allFiles=files.split('\n')
+    allFiles=files
     for i in allFiles:
         if i!='':
             fileInfo[i]=[calculateMD5Sum(i),time.ctime(os.path.getmtime(i))]
@@ -127,19 +131,19 @@ while True:
 
         # find . -type d -name "*" -print
         output = showallfolders(mypath)
-        files=[]
+        shortfiles=[]
         for w in range(len(output)):
             tempfiles = [f for f in glob.glob(os.path.join(output[w], "*")) if test(f,int(start),int(end))]
-            files+=tempfiles        
-        for i in range(len(files)):
-            (status,output)=commands.getstatusoutput('ls -l %s'%(files[i]))
+            shortfiles+=tempfiles        
+        for i in range(len(tempfiles)):
+            (status,output)=commands.getstatusoutput('ls -l %s'%(tempfiles[i]))
             if(output[0]=='-'):
                 output += "   File"
             else:
                 output += "   Folder"
-            files[i]=output
-        for i in range(len(files)):
-            sendInfo(protocol,files[i])
+            tempfiles[i]=output
+        for i in range(len(tempfiles)):
+            sendInfo(protocol,tempfiles[i])
             print recvInfo(protocol,1024)
             print('Sent ',files[i])
         sendInfo(protocol,'0')
@@ -156,9 +160,10 @@ while True:
         except:
             sendInfo(protocol,"Invalid regex")
             continue
+        tempfiles=[]
         for yy in range(len(files)):
-            files[yy] = files[yy].split('/')[-1]
-        for i in files:
+            tempfiles.append(files[yy].split('/')[-1])
+        for i in tempfiles:
             matched=checkMatch.findall(i)
             if matched:
                 matchedFiles+=i+'\n'
