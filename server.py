@@ -42,7 +42,7 @@ def showDetails():
     return res.stdout.read()
 
 def showallfolders(mypath):
-    (status,output)=commands.getstatusoutput('find %s -not -path "*/\.*" -type d' %(mypath[0]))
+    (status,output)=commands.getstatusoutput('find %s -not -path "*/\.*" -type d' %(mypath))
     output=output.split('\n')
     return output
 

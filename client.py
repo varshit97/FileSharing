@@ -20,7 +20,13 @@ port = 60001                                                    # Reserve a port
 requests=[]
 
 serverIp=raw_input("Enter IP of server: ")
-protocol=raw_input("Press 1 for TCP and 2 for UDP: ")
+
+protocol=''
+
+while True:
+    protocol=raw_input("Press 1 for TCP and 2 for UDP: ")
+    if protocol=='1' or protocol=='2':
+        break
 
 if protocol=='1':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       # Create a socket object
