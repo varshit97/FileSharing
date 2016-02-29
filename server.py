@@ -109,9 +109,13 @@ history=[]
 output = showallfolders(mypath)
 files=[]
 for w in range(len(output)):
+    templist=[]
     tempfiles = [f for f in glob.glob(os.path.join(output[w], "*"))]
-    # (status,x)=commands.getstatusoutput('ls -l %s' %(tempfiles))
-    files+=tempfiles
+    print tempfiles
+    for i in range(len(tempfiles)):
+        if os.path.isfile(tempfiles[i]):
+            templist.append(tempfiles[i])
+    files+=templist
 
 while True:
     #Data sent from clientside
